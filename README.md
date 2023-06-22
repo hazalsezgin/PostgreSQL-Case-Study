@@ -8,8 +8,9 @@ Please note that all the information regarding the case study has been sourced f
 🧹<h1>A. Data Exploration and Cleansing<h1>
 1.Update the fresh_segments.interest_metrics table by modifying the month_year column to be a date data type with the start of the month
 
-'''ALTER TABLE fresh_segments.interest_metrics
-ALTER COLUMN month_year TYPE DATE USING to_date('01-' || month_year, 'DD-MM-YYYY');
+```ALTER TABLE fresh_segments.interest_metrics
+   ALTER COLUMN month_year TYPE DATE USING to_date('01-' || month_year, 'DD-MM-YYYY');
+```
 
 
 
