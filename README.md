@@ -13,7 +13,13 @@ Please note that all the information regarding the case study has been sourced f
 ```
 
 2. What is count of records in the fresh_segments.interest_metrics for each month_year value sorted in chronological order (earliest to latest) with the null values appearing first?
-   
+```
+SELECT 
+  month_year, COUNT(*)
+FROM fresh_segments.interest_metrics
+GROUP BY month_year
+ORDER BY month_year NULLS FIRST;
+```
 
 
 
