@@ -6,7 +6,8 @@ Question and Solution
 Please note that all the information regarding the case study has been sourced from the following link: .
 
 <h1>🧹 Data Exploration and Cleansing<h1>
-1. Update the fresh_segments.interest_metrics table by modifying the month_year column to be a date data type with the start of the month
+   
+### 1. Update the fresh_segments.interest_metrics table by modifying the month_year column to be a date data type with the start of the month
 
 ```ALTER TABLE fresh_segments.interest_metrics
    ALTER COLUMN month_year TYPE DATE USING to_date('01-' || month_year, 'DD-MM-YYYY');
@@ -40,7 +41,7 @@ FROM fresh_segments.interest_map map
 FULL OUTER JOIN fresh_segments.interest_metrics metrics
   ON metrics.interest_id::integer = map.id;
 ```
-![Uploading image.png…]()
+![image](https://github.com/hazalsezgin/case/assets/77546910/c7070aac-3404-43c4-9360-67199020b3d3)
 
 ![4](https://github.com/hazalsezgin/case/assets/77546910/b93c167d-2c6b-4936-98d1-e65bf3f712df)
 
@@ -73,10 +74,67 @@ WHERE TO_DATE(metrics.month_year || '-01', 'MM-YYYY') < map.created_at::DATE;
 
 <h1>:fire:Interest Analysis<h1>
 
+### 1.Which interests have been present in all month_year dates in our dataset?
+```
+SELECT
+    month_year,
+    COUNT(*) AS interest_count
+FROM fresh_segments.interest_metrics
+GROUP BY month_year
+ORDER BY month_year;
+```
+![int 1](https://github.com/hazalsezgin/case/assets/77546910/2d41d78e-916f-4639-a426-709d6c04580e)
 
+2.Using this same total_months measure - calculate the cumulative percentage of all records starting at 14 months - which total_months value passes the 90% cumulative percentage value?
+```
+WITH month_yearPer_interest AS(
+SELECT 
+    interest_id,
+    COUNT(month_year) AS month_year_counts
+FROM fresh_segments.interest_metrics
+GROUP BY interest_id
+)
+SELECT 
+    month_year_counts,
+    COUNT(interest_id) AS interest_count,
+    ROUND(100*SUM(COUNT(interest_id)) OVER(ORDER BY month_year_counts DESC)/ SUM(COUNT(interest_id)) OVER(), 2) AS cumulative_percent
+FROM month_yearPer_interest
+GROUP BY month_year_counts
+ORDER BY month_year_counts DESC;
+```
+![int2](https://github.com/hazalsezgin/case/assets/77546910/1594ac25-aa0f-4d50-94b4-4f611ec59815)
 
+3.If we were to remove all interest_id values which are lower than the total_months value we found in the previous question - how many total data points would we be removing?
+```
+WITH unremoved_records AS(
+SELECT 
+    interest_id
+FROM fresh_segments.interest_metrics
+WHERE interest_id IS NOT NULL
+GROUP BY interest_id
+HAVING COUNT(DISTINCT month_year) >=6
+)
+SELECT
+    COUNT(*) AS removed_records
+FROM fresh_segments.interest_metrics
+WHERE NOT EXISTS (
+        SELECT 1
+        FROM unremoved_records
+        WHERE interest_metrics.interest_id = unremoved_records.interest_id);
+```
 
+![int4](https://github.com/hazalsezgin/case/assets/77546910/406e8990-8b26-47ac-89bc-b18c8de45c43)
 
+4.Does this decision make sense to remove these data points from a business perspective? Use an example where there are all 14 months present to a removed interest example for your arguments - think about what it means to have less months present from a segment perspective.
+```
 
+```
+
+5.How would you describe our customers in this segment based off their composition and ranking values? What sort of products or services should we show to these customers and what should we avoid?
+
+```
+
+```
+<h1>🎯Segment Analysis<h1>
 
 
