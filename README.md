@@ -1,4 +1,4 @@
-<h1>Case Study #5: Data Mart</h1>
+![image](https://github.com/hazalsezgin/case/assets/77546910/e907aaee-ab43-4119-bf41-8e8772e3aa57)<h1>Case Study #5: Data Mart</h1>
 💼 Table of Contents
 Business Task
 Entity Relationship Diagram
@@ -128,6 +128,7 @@ WHERE NOT EXISTS (
 4.Does this decision make sense to remove these data points from a business perspective? Use an example where there are all 14 months present to a removed interest example for your arguments - think about what it means to have less months present from a segment perspective.
 ```
 
+
 ```
 
 5.How would you describe our customers in this segment based off their composition and ranking values? What sort of products or services should we show to these customers and what should we avoid?
@@ -136,5 +137,165 @@ WHERE NOT EXISTS (
 
 ```
 <h1>🎯Segment Analysis<h1>
+   
+### 1.Using our filtered dataset by removing the interests with less than 6 months worth of data, which are the top 10 and bottom 10 interests which have the largest composition values in any month_year? Only use the maximum composition value for each interest but you must keep the corresponding month_year
+```
+
+```
+2.Which 5 interests had the lowest average ranking value?
+```
+SELECT
+    interest_map.interest_name,
+    ROUND(AVG(ranking), 1) AS average_ranking,
+    COUNT(*) AS record_count
+FROM fresh_segments.interest_metrics
+INNER JOIN fresh_segments.interest_map
+    ON CAST(interest_metrics.interest_id AS INTEGER) = interest_map.id
+GROUP BY interest_map.interest_name
+ORDER BY average_ranking
+LIMIT 5;
+
+```
+![seg 2](https://github.com/hazalsezgin/case/assets/77546910/d23fdca1-4c17-41a4-a25f-00ce2c2186d1)
+
+3.Which 5 interests had the largest standard deviation in their percentile_ranking value?
+```
+SELECT
+    interest_metrics.interest_id,
+    interest_map.interest_name,
+    ROUND(CAST(STDDEV(percentile_ranking) AS NUMERIC), 1) AS stddev_pc,
+    MAX(percentile_ranking) AS max_pc,
+    MIN(percentile_ranking) AS min_pc,
+    COUNT(*) AS record_counts
+FROM fresh_segments.interest_metrics
+INNER JOIN fresh_segments.interest_map
+    ON CAST(interest_metrics.interest_id AS INTEGER) = interest_map.id
+WHERE month_year IS NOT NULL
+GROUP BY 
+    interest_metrics.interest_id,
+    interest_map.interest_name
+HAVING STDDEV(percentile_ranking) IS NOT NULL
+ORDER BY stddev_pc DESC
+LIMIT 5;
+```
+![seg3](https://github.com/hazalsezgin/case/assets/77546910/be8a9249-a174-4d90-bb9c-3c3dbc5e68db)
+
+4.For the 5 interests found in the previous question - what was minimum and maximum percentile_ranking values for each interest and its corresponding year_month value? Can you describe what is happening for these 5 interests?
+```
+WITH max_stddev_interests AS (
+  SELECT
+    CAST(interest_metrics.interest_id AS INTEGER) AS interest_id,
+    interest_map.interest_name,
+    ROUND(CAST(STDDEV(percentile_ranking) AS NUMERIC), 1) AS stddev_pc,
+    MAX(percentile_ranking) AS max_pc
+  FROM fresh_segments.interest_metrics
+  INNER JOIN fresh_segments.interest_map ON interest_metrics.interest_id = interest_map.id
+  WHERE month_year IS NOT NULL
+  GROUP BY interest_metrics.interest_id, interest_map.interest_name
+  HAVING STDDEV(percentile_ranking) IS NOT NULL
+  ORDER BY stddev_pc DESC
+  LIMIT 5
+)
+SELECT
+  t2.interest_name,
+  t1.month_year,
+  t1.ranking,
+  t1.percentile_ranking,
+  t1.composition,
+  t2.stddev_pc,
+  RANK() OVER (ORDER BY stddev_pc DESC) AS max_stddev_ranking
+FROM fresh_segments
+```
+<h1>🎯Index Analysis<h1>
+   
+### 1.What is the top 10 interests by the average composition for each month?
+```
+WITH avg_compositions AS (
+  SELECT 
+    interest_metrics.month_year,
+    interest_map.interest_name,
+    ROUND(CAST(interest_metrics.composition / interest_metrics.index_value AS NUMERIC), 2) AS index_composition,
+    RANK() OVER (PARTITION BY interest_metrics.month_year ORDER BY interest_metrics.composition / interest_metrics.index_value DESC) AS index_rank
+  FROM fresh_segments.interest_metrics
+  INNER JOIN fresh_segments.interest_map ON interest_metrics.interest_id::integer = interest_map.id
+)
+SELECT *
+FROM avg_compositions
+WHERE index_rank <= 10;
+
+```
+![index1](https://github.com/hazalsezgin/case/assets/77546910/bd8314d0-a93f-4779-814e-9467d79be6d4)
+
+2.For all of these top 10 interests - which interest appears the most often?
+```
+WITH avg_compositions AS (
+  SELECT 
+    interest_metrics.month_year,
+    interest_map.interest_name,
+    ROUND(CAST(interest_metrics.composition / interest_metrics.index_value AS NUMERIC), 2) AS index_composition,
+    RANK() OVER (PARTITION BY interest_metrics.month_year ORDER BY interest_metrics.composition / interest_metrics.index_value DESC) AS index_rank
+  FROM fresh_segments.interest_metrics
+  INNER JOIN fresh_segments.interest_map ON interest_metrics.interest_id::integer = interest_map.id
+)
+SELECT 
+    interest_name,
+    COUNT(*) AS interest_frequency
+FROM avg_compositions
+WHERE index_rank <= 10
+GROUP BY interest_name
+ORDER BY interest_frequency DESC;
+```
+![index 2](https://github.com/hazalsezgin/case/assets/77546910/fa4db9bd-e039-47bc-ade5-a90582d05e2e)
+
+3.What is the average of the average composition for the top 10 interests for each month?
+```
+WITH avg_compositions AS (
+  SELECT 
+    interest_metrics.month_year,
+    interest_map.interest_name,
+    ROUND(CAST(interest_metrics.composition / interest_metrics.index_value AS NUMERIC), 2) AS index_composition,
+    RANK() OVER (PARTITION BY interest_metrics.month_year ORDER BY interest_metrics.composition / interest_metrics.index_value DESC) AS index_rank
+  FROM fresh_segments.interest_metrics
+  INNER JOIN fresh_segments.interest_map ON interest_metrics.interest_id::integer = interest_map.id::integer
+)
+SELECT 
+    month_year,
+    ROUND(AVG(index_composition), 2) AS avg_index_composition
+FROM avg_compositions
+WHERE index_rank <= 10
+GROUP BY month_year
+ORDER BY month_year;
+```
+![index 3](https://github.com/hazalsezgin/case/assets/77546910/31e8e780-419f-43c9-987a-d5718398329b)
+
+4.What is the 3 month rolling average of the max average composition value from September 2018 to August 2019 and include the previous top ranking interests in the same output shown below.
+```
+WITH compositions AS (
+  SELECT 
+    interest_metrics.month_year,
+    interest_map.interest_name,
+    ROUND(CAST(interest_metrics.composition / interest_metrics.index_value AS NUMERIC), 2) AS index_composition,
+    MAX(ROUND(CAST(interest_metrics.composition / interest_metrics.index_value AS NUMERIC), 2)) OVER (PARTITION BY interest_metrics.month_year) AS max_index_composition,
+    RANK() OVER (PARTITION BY interest_metrics.month_year ORDER BY interest_metrics.composition / interest_metrics.index_value DESC) AS index_rank
+  FROM fresh_segments.interest_metrics
+  INNER JOIN fresh_segments.interest_map ON interest_metrics.interest_id::integer = interest_map.id::integer
+),
+max_composition_data AS (
+  SELECT
+    month_year,
+    interest_name,
+    max_index_composition,
+    ROUND(AVG(max_index_composition) OVER (ORDER BY month_year ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS mvg_avg_3month,
+    LAG(interest_name || ': ' || max_index_composition, 1) OVER (ORDER BY month_year) AS "1month_ago",
+    LAG(interest_name || ': ' || max_index_composition, 2) OVER (ORDER BY month_year) AS "2months_ago"
+  FROM compositions
+  WHERE index_rank::integer = 1
+)
+SELECT *
+FROM max_composition_data
+WHERE "2months_ago" IS NOT NULL;
+
+```
+![index 4](https://github.com/hazalsezgin/case/assets/77546910/a601678e-9803-4421-89d2-05439ca511f7)
 
 
