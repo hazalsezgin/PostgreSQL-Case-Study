@@ -1,4 +1,4 @@
-![image](https://github.com/hazalsezgin/case/assets/77546910/e907aaee-ab43-4119-bf41-8e8772e3aa57)<h1>Case Study #5: Data Mart</h1>
+<h1>Case Study #5: Data Mart</h1>
 💼 Table of Contents
 Business Task
 Entity Relationship Diagram
