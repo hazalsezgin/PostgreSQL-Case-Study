@@ -1,9 +1,15 @@
-<h1>Case Study #5: Data Mart</h1>
-💼 Table of Contents
-Business Task
-Entity Relationship Diagram
-Question and Solution
-Please note that all the information regarding the case study has been sourced from the following link: .
+<h1>Case Study #8: Fresh Segments </h1>
+
+![8](https://github.com/hazalsezgin/case/assets/77546910/9d565fa8-d9e2-4f22-a6d6-bbbe6d2840f6)
+Danny created Fresh Segments, a digital marketing agency that helps other businesses analyse trends in online ad click behaviour for their unique customer base.
+
+Clients share their customer lists with the Fresh Segments team who then aggregate interest metrics and generate a single dataset worth of metrics for further analysis.
+
+In particular - the composition and rankings for different interests are provided for each client showing the proportion of their customer list who interacted with online assets related to each interest for each month.
+
+Danny has asked for your assistance to analyse aggregated metrics for an example client and provide some high level insights about the customer list and their interests.
+
+If you want to learn more about this case, click [here https://8weeksqlchallenge.com/case-study-8/]
 
 <h1>🧹 Data Exploration and Cleansing<h1>
    
