@@ -9,7 +9,7 @@ In particular - the composition and rankings for different interests are provide
 
 Danny has asked for your assistance to analyse aggregated metrics for an example client and provide some high level insights about the customer list and their interests.
 
-If you want to learn more about this case, click [here https://8weeksqlchallenge.com/case-study-8/]
+If you want to learn more about this case, click [here](https://8weeksqlchallenge.com/case-study-8)
 
 <h1>🧹 Data Exploration and Cleansing<h1>
    
