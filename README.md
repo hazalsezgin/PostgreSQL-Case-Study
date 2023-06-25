@@ -1,6 +1,6 @@
 <h1>Case Study #8: Fresh Segments </h1>
 
-![8](https://github.com/hazalsezgin/case/assets/77546910/9d565fa8-d9e2-4f22-a6d6-bbbe6d2840f6)
+### ![8](https://github.com/hazalsezgin/case/assets/77546910/9d565fa8-d9e2-4f22-a6d6-bbbe6d2840f6)
 Danny created Fresh Segments, a digital marketing agency that helps other businesses analyse trends in online ad click behaviour for their unique customer base.
 
 Clients share their customer lists with the Fresh Segments team who then aggregate interest metrics and generate a single dataset worth of metrics for further analysis.
