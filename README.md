@@ -1,6 +1,6 @@
 <h1>Case Study #8: Fresh Segments </h1>
 
-### ![8](https://github.com/hazalsezgin/case/assets/77546910/9d565fa8-d9e2-4f22-a6d6-bbbe6d2840f6)
+###### ![8](https://github.com/hazalsezgin/case/assets/77546910/9d565fa8-d9e2-4f22-a6d6-bbbe6d2840f6)
 Danny created Fresh Segments, a digital marketing agency that helps other businesses analyse trends in online ad click behaviour for their unique customer base.
 
 Clients share their customer lists with the Fresh Segments team who then aggregate interest metrics and generate a single dataset worth of metrics for further analysis.
@@ -20,21 +20,27 @@ If you want to learn more about this case, click [here](https://8weeksqlchalleng
 ```
 
 2. What is count of records in the fresh_segments.interest_metrics for each month_year value sorted in chronological order (earliest to latest) with the null values appearing first?
-```![2](https://github.com/hazalsezgin/case/assets/77546910/44fde222-5973-40de-94a2-eed34d9677c1)
-
+```
 SELECT 
   month_year, COUNT(*)
 FROM fresh_segments.interest_metrics
 GROUP BY month_year
 ORDER BY month_year NULLS FIRST;
 ```
-![2](https://github.com/hazalsezgin/case/assets/77546910/44fde222-5973-40de-94a2-eed34d9677c1)
+![intereest2](https://github.com/hazalsezgin/case/assets/77546910/c9877999-1565-475e-81f5-279467a36302)
+
 
 3.What do you think we should do with these null values in the fresh_segments.interest_metrics
 ```
-
+SELECT 
+  COUNT(month_year) AS record_counts
+FROM fresh_segments.interest_metrics
+WHERE month_year IS NULL;
+--Dealing with Nulls : here it is best to delete those rows
+DELETE FROM fresh_segments.interest_metrics WHERE month_year IS NULL;
 ```
-![3](https://github.com/hazalsezgin/case/assets/77546910/54467b6f-efb8-439e-9316-55db4cfb1f25)
+![rec](https://github.com/hazalsezgin/case/assets/77546910/6de00a95-9bde-4207-bf9f-24edc199fce0)
+
 
 4.How many interest_id values exist in the fresh_segments.interest_metrics table but not in the fresh_segments.interest_map table? What about the other way around?
 ```
@@ -47,12 +53,13 @@ FROM fresh_segments.interest_map map
 FULL OUTER JOIN fresh_segments.interest_metrics metrics
   ON metrics.interest_id::integer = map.id;
 ```
-![image](https://github.com/hazalsezgin/case/assets/77546910/c7070aac-3404-43c4-9360-67199020b3d3)
+
 
 ![4](https://github.com/hazalsezgin/case/assets/77546910/b93c167d-2c6b-4936-98d1-e65bf3f712df)
 
 5.Summarise the id values in the fresh_segments.interest_map by its total record count in this table
 ```
+
 ```
 
 6.What sort of table join should we perform for our analysis and why? Check your logic by checking the rows where interest_id = 21246 in your joined output and include all columns from fresh_segments.interest_metrics and all columns from fresh_segments.interest_map except from the id column.
@@ -131,21 +138,34 @@ WHERE NOT EXISTS (
 
 ![int4](https://github.com/hazalsezgin/case/assets/77546910/406e8990-8b26-47ac-89bc-b18c8de45c43)
 
-4.Does this decision make sense to remove these data points from a business perspective? Use an example where there are all 14 months present to a removed interest example for your arguments - think about what it means to have less months present from a segment perspective.
-```
 
-
-```
-
-5.How would you describe our customers in this segment based off their composition and ranking values? What sort of products or services should we show to these customers and what should we avoid?
-
-```
-
-```
 <h1>🎯Segment Analysis<h1>
    
 ### 1.Using our filtered dataset by removing the interests with less than 6 months worth of data, which are the top 10 and bottom 10 interests which have the largest composition values in any month_year? Only use the maximum composition value for each interest but you must keep the corresponding month_year
 ```
+WITH max_compositions AS (
+    SELECT
+        interest_metrics.interest_id::integer,
+        interest_metrics.month_year,
+        interest_map.interest_name,
+        interest_metrics.composition,
+        MAX(composition) OVER(PARTITION BY interest_metrics.interest_id) AS max_composition
+    FROM fresh_segments.interest_metrics
+    INNER JOIN fresh_segments.interest_map
+        ON interest_metrics.interest_id = interest_map.id
+),
+final_compositions AS (
+    SELECT 
+        month_year,
+        interest_name,
+        max_composition
+    FROM max_compositions
+    WHERE max_composition = composition
+)
+(SELECT * FROM final_compositions ORDER BY max_composition DESC LIMIT 10)
+UNION 
+(SELECT * FROM final_compositions ORDER BY max_composition LIMIT 10)
+ORDER BY max_composition DESC;
 
 ```
 2.Which 5 interests had the lowest average ranking value?
