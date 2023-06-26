@@ -57,10 +57,6 @@ FULL OUTER JOIN fresh_segments.interest_metrics metrics
 
 ![4](https://github.com/hazalsezgin/case/assets/77546910/b93c167d-2c6b-4936-98d1-e65bf3f712df)
 
-5.Summarise the id values in the fresh_segments.interest_map by its total record count in this table
-```
-
-```
 
 6.What sort of table join should we perform for our analysis and why? Check your logic by checking the rows where interest_id = 21246 in your joined output and include all columns from fresh_segments.interest_metrics and all columns from fresh_segments.interest_map except from the id column.
 ```
@@ -143,31 +139,38 @@ WHERE NOT EXISTS (
    
 ### 1.Using our filtered dataset by removing the interests with less than 6 months worth of data, which are the top 10 and bottom 10 interests which have the largest composition values in any month_year? Only use the maximum composition value for each interest but you must keep the corresponding month_year
 ```
-WITH max_compositions AS (
-    SELECT
-        interest_metrics.interest_id::integer,
-        interest_metrics.month_year,
-        interest_map.interest_name,
-        interest_metrics.composition,
-        MAX(composition) OVER(PARTITION BY interest_metrics.interest_id) AS max_composition
-    FROM fresh_segments.interest_metrics
-    INNER JOIN fresh_segments.interest_map
-        ON interest_metrics.interest_id = interest_map.id
-),
-final_compositions AS (
-    SELECT 
-        month_year,
-        interest_name,
-        max_composition
-    FROM max_compositions
-    WHERE max_composition = composition
+WITH seg_compo AS (SELECT
+    interest_id,
+    month_year,
+    composition,
+    RANK() OVER(PARTITION BY interest_id ORDER BY composition DESC) as rank_num
+FROM fresh_segments.interest_metrics
+), top_10 AS ( 
+SELECT 
+    month_year,
+    interest_id,
+    composition
+FROM seg_compo
+WHERE rank_num = 1 
+ORDER BY composition DESC
+LIMIT 10
+), bottom_10 AS ( SELECT 
+    month_year,
+    interest_id,
+    composition
+FROM seg_compo
+WHERE rank_num = 1 
+ORDER BY composition 
+LIMIT 10    
 )
-(SELECT * FROM final_compositions ORDER BY max_composition DESC LIMIT 10)
+SELECT * FROM top_10
 UNION 
-(SELECT * FROM final_compositions ORDER BY max_composition LIMIT 10)
-ORDER BY max_composition DESC;
-
+SELECT * FROM bottom_10
+ORDER BY 3 DESC;
 ```
+![seg comp](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/e5c66cb3-c353-4b44-b45b-2ab87e7064d7)
+
+
 2.Which 5 interests had the lowest average ranking value?
 ```
 SELECT
