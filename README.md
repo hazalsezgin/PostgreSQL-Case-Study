@@ -249,7 +249,7 @@ SELECT
   RANK() OVER (ORDER BY stddev_pc DESC) AS max_stddev_ranking
 FROM fresh_segments
 ```
-<h1>🎯Index Analysis<h1>
+<h1>:file_folder:  Index Analysis<h1>
    
 ### 
 1.What is the top 10 interests by the average composition for each month?
