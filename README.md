@@ -1,6 +1,8 @@
 <h1>Case Study #8: Fresh Segments </h1>
 
-###### ![8](https://github.com/hazalsezgin/case/assets/77546910/9d565fa8-d9e2-4f22-a6d6-bbbe6d2840f6)
+###### 
+![8](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/554f124c-78df-4971-8902-37284eaf854b)
+
 Danny created Fresh Segments, a digital marketing agency that helps other businesses analyse trends in online ad click behaviour for their unique customer base.
 
 Clients share their customer lists with the Fresh Segments team who then aggregate interest metrics and generate a single dataset worth of metrics for further analysis.
@@ -28,7 +30,8 @@ FROM fresh_segments.interest_metrics
 GROUP BY month_year
 ORDER BY month_year NULLS FIRST;
 ```
-![intereest2](https://github.com/hazalsezgin/case/assets/77546910/c9877999-1565-475e-81f5-279467a36302)
+![t2](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/6d2ddb73-4fd9-4ea7-9158-501f9c2031c9)
+
 
 
 3.What do you think we should do with these null values in the fresh_segments.interest_metrics
@@ -40,7 +43,8 @@ WHERE month_year IS NULL;
 --Dealing with Nulls : here it is best to delete those rows
 DELETE FROM fresh_segments.interest_metrics WHERE month_year IS NULL;
 ```
-![rec](https://github.com/hazalsezgin/case/assets/77546910/6de00a95-9bde-4207-bf9f-24edc199fce0)
+![t3](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/1fd1ad8f-7769-462b-8e38-3dc9fee6f63f)
+
 
 
 4.How many interest_id values exist in the fresh_segments.interest_metrics table but not in the fresh_segments.interest_map table? What about the other way around?
@@ -54,9 +58,8 @@ FROM fresh_segments.interest_map map
 FULL OUTER JOIN fresh_segments.interest_metrics metrics
   ON metrics.interest_id::integer = map.id;
 ```
+![t4](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/0ca2b7d9-f62b-4249-9aec-5e4bac35be69)
 
-
-![4](https://github.com/hazalsezgin/case/assets/77546910/b93c167d-2c6b-4936-98d1-e65bf3f712df)
 
 
 6.What sort of table join should we perform for our analysis and why? Check your logic by checking the rows where interest_id = 21246 in your joined output and include all columns from fresh_segments.interest_metrics and all columns from fresh_segments.interest_map except from the id column.
@@ -68,7 +71,8 @@ INNER JOIN fresh_segments.interest_metrics metrics
 WHERE metrics.interest_id = '21246'
   AND metrics._month IS NOT NULL;
 ```
-![6](https://github.com/hazalsezgin/case/assets/77546910/d2c7ee4d-3a6b-4f07-940d-f405771742b7)
+![t6](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/3c3fe83f-3258-41b7-907b-a1a07ccf88ec)
+
 
 
 7.Are there any records in your joined table where the month_year value is before the created_at value from the fresh_segments.interest_map table? Do you think these values are valid and why?
@@ -79,7 +83,8 @@ INNER JOIN fresh_segments.interest_metrics metrics
   ON map.id = CAST(metrics.interest_id AS integer)
 WHERE TO_DATE(metrics.month_year || '-01', 'MM-YYYY') < map.created_at::DATE;
 ```
-![7](https://github.com/hazalsezgin/case/assets/77546910/a26a7c8f-699c-496c-8e9a-484450a06b84)
+![t7](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/2babebd6-30ab-463f-b5ee-9762c0f3e22c)
+
 
 
 <h1>:fire:Interest Analysis<h1>
@@ -94,7 +99,9 @@ FROM fresh_segments.interest_metrics
 GROUP BY month_year
 ORDER BY month_year;
 ```
-![int 1](https://github.com/hazalsezgin/case/assets/77546910/2d41d78e-916f-4639-a426-709d6c04580e)
+![i1](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/0d0d3eb6-0964-44e7-9651-761215157598)
+
+
 
 2.Using this same total_months measure - calculate the cumulative percentage of all records starting at 14 months - which total_months value passes the 90% cumulative percentage value?
 ```
@@ -113,7 +120,9 @@ FROM month_yearPer_interest
 GROUP BY month_year_counts
 ORDER BY month_year_counts DESC;
 ```
-![int2](https://github.com/hazalsezgin/case/assets/77546910/1594ac25-aa0f-4d50-94b4-4f611ec59815)
+![i2](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/70f78cce-3767-4c12-89bc-d4bdee757adc)
+
+
 
 3.If we were to remove all interest_id values which are lower than the total_months value we found in the previous question - how many total data points would we be removing?
 ```
@@ -134,8 +143,7 @@ WHERE NOT EXISTS (
         WHERE interest_metrics.interest_id = unremoved_records.interest_id);
 ```
 
-![int4](https://github.com/hazalsezgin/case/assets/77546910/406e8990-8b26-47ac-89bc-b18c8de45c43)
-
+![i3](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/ee9cd412-d5c1-4b19-8462-781ea0e34a1c)
 
 <h1>🎯Segment Analysis<h1>
    
@@ -171,7 +179,8 @@ UNION
 SELECT * FROM bottom_10
 ORDER BY 3 DESC;
 ```
-![seg comp](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/e5c66cb3-c353-4b44-b45b-2ab87e7064d7)
+![s1](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/b0cae43b-1af6-4349-a818-5d1a8e873f78)
+
 
 
 2.Which 5 interests had the lowest average ranking value?
@@ -188,7 +197,8 @@ ORDER BY average_ranking
 LIMIT 5;
 
 ```
-![seg 2](https://github.com/hazalsezgin/case/assets/77546910/d23fdca1-4c17-41a4-a25f-00ce2c2186d1)
+![s2](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/0fe19702-a808-4b48-a547-5d5f99c8486f)
+
 
 3.Which 5 interests had the largest standard deviation in their percentile_ranking value?
 ```
@@ -210,7 +220,8 @@ HAVING STDDEV(percentile_ranking) IS NOT NULL
 ORDER BY stddev_pc DESC
 LIMIT 5;
 ```
-![seg3](https://github.com/hazalsezgin/case/assets/77546910/be8a9249-a174-4d90-bb9c-3c3dbc5e68db)
+![s3](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/0e1e43e6-2994-4116-84cd-33d2a194879a)
+
 
 4.For the 5 interests found in the previous question - what was minimum and maximum percentile_ranking values for each interest and its corresponding year_month value? Can you describe what is happening for these 5 interests?
 ```
@@ -257,7 +268,8 @@ FROM avg_compositions
 WHERE index_rank <= 10;
 
 ```
-![index1](https://github.com/hazalsezgin/case/assets/77546910/bd8314d0-a93f-4779-814e-9467d79be6d4)
+![in1](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/a4e8566b-b16f-488f-9ace-e5099e679d24)
+
 
 2.For all of these top 10 interests - which interest appears the most often?
 ```
@@ -278,7 +290,8 @@ WHERE index_rank <= 10
 GROUP BY interest_name
 ORDER BY interest_frequency DESC;
 ```
-![index 2](https://github.com/hazalsezgin/case/assets/77546910/fa4db9bd-e039-47bc-ade5-a90582d05e2e)
+![in2](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/05bc0aca-ab6b-426c-bc51-4358d3891197)
+
 
 3.What is the average of the average composition for the top 10 interests for each month?
 ```
@@ -299,7 +312,7 @@ WHERE index_rank <= 10
 GROUP BY month_year
 ORDER BY month_year;
 ```
-![index 3](https://github.com/hazalsezgin/case/assets/77546910/31e8e780-419f-43c9-987a-d5718398329b)
+![in3](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/39bc584a-f728-44a4-a887-1d97a6a0175c)
 
 4.What is the 3 month rolling average of the max average composition value from September 2018 to August 2019 and include the previous top ranking interests in the same output shown below.
 ```
@@ -329,6 +342,7 @@ FROM max_composition_data
 WHERE "2months_ago" IS NOT NULL;
 
 ```
-![index 4](https://github.com/hazalsezgin/case/assets/77546910/a601678e-9803-4421-89d2-05439ca511f7)
+![in4](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/56b21ce1-b13d-4ae2-87df-04b2bd6975e4)
+
 
 
