@@ -13,7 +13,8 @@ If you want to learn more about this case, click [here](https://8weeksqlchalleng
 
 <h1>🧹 Data Exploration and Cleansing<h1>
    
-### 1. Update the fresh_segments.interest_metrics table by modifying the month_year column to be a date data type with the start of the month
+### 
+1. Update the fresh_segments.interest_metrics table by modifying the month_year column to be a date data type with the start of the month
 
 ```ALTER TABLE fresh_segments.interest_metrics
    ALTER COLUMN month_year TYPE DATE USING to_date('01-' || month_year, 'DD-MM-YYYY');
@@ -83,7 +84,8 @@ WHERE TO_DATE(metrics.month_year || '-01', 'MM-YYYY') < map.created_at::DATE;
 
 <h1>:fire:Interest Analysis<h1>
 
-### 1.Which interests have been present in all month_year dates in our dataset?
+### 
+1.Which interests have been present in all month_year dates in our dataset?
 ```
 SELECT
     month_year,
@@ -137,7 +139,8 @@ WHERE NOT EXISTS (
 
 <h1>🎯Segment Analysis<h1>
    
-### 1.Using our filtered dataset by removing the interests with less than 6 months worth of data, which are the top 10 and bottom 10 interests which have the largest composition values in any month_year? Only use the maximum composition value for each interest but you must keep the corresponding month_year
+### 
+1.Using our filtered dataset by removing the interests with less than 6 months worth of data, which are the top 10 and bottom 10 interests which have the largest composition values in any month_year? Only use the maximum composition value for each interest but you must keep the corresponding month_year
 ```
 WITH seg_compo AS (SELECT
     interest_id,
@@ -237,7 +240,8 @@ FROM fresh_segments
 ```
 <h1>🎯Index Analysis<h1>
    
-### 1.What is the top 10 interests by the average composition for each month?
+### 
+1.What is the top 10 interests by the average composition for each month?
 ```
 WITH avg_compositions AS (
   SELECT 
