@@ -222,33 +222,6 @@ LIMIT 5;
 ```
 ![s3](https://github.com/hazalsezgin/PostegreSQL-Case-Study/assets/77546910/0e1e43e6-2994-4116-84cd-33d2a194879a)
 
-
-4.For the 5 interests found in the previous question - what was minimum and maximum percentile_ranking values for each interest and its corresponding year_month value? Can you describe what is happening for these 5 interests?
-```
-WITH max_stddev_interests AS (
-  SELECT
-    CAST(interest_metrics.interest_id AS INTEGER) AS interest_id,
-    interest_map.interest_name,
-    ROUND(CAST(STDDEV(percentile_ranking) AS NUMERIC), 1) AS stddev_pc,
-    MAX(percentile_ranking) AS max_pc
-  FROM fresh_segments.interest_metrics
-  INNER JOIN fresh_segments.interest_map ON interest_metrics.interest_id = interest_map.id
-  WHERE month_year IS NOT NULL
-  GROUP BY interest_metrics.interest_id, interest_map.interest_name
-  HAVING STDDEV(percentile_ranking) IS NOT NULL
-  ORDER BY stddev_pc DESC
-  LIMIT 5
-)
-SELECT
-  t2.interest_name,
-  t1.month_year,
-  t1.ranking,
-  t1.percentile_ranking,
-  t1.composition,
-  t2.stddev_pc,
-  RANK() OVER (ORDER BY stddev_pc DESC) AS max_stddev_ranking
-FROM fresh_segments
-```
 <h1>:file_folder:  Index Analysis<h1>
    
 ### 
